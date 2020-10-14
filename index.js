@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const port = 5000;
 const fs = require('fs-extra');
+const ObjectId = require('mongodb').ObjectId;
 
 require('dotenv').config()
 
@@ -56,6 +57,23 @@ client.connect(err => {
         })
     })
 
+    //add user feedback
+    app.post('/addUserFeedback', (req, res) => {
+        const feedback = req.body;
+        userFeedBackCollection.insertOne(feedback)
+            .then(result => {
+                res.send(result.insertedCount > 0)
+            })
+    })
+    // load user feedback from database
+    // here loard last 6 users feedback
+    app.get('/loadFeedback', (req, res) => {
+        userFeedBackCollection.find({}).sort({_id:-1}).limit(6)
+            .toArray((err, documents) => {
+                res.send(documents)
+            })
+    })
+
     // add order in databse
     app.post('/addOrder', (req, res) => {
         const file = req.files.file;
@@ -64,6 +82,7 @@ client.connect(err => {
         const service = req.body.service;
         const projectDetails = req.body.projectDetails;
         const price = req.body.price;
+        const status = req.body.status;
 
         const filePath = `${__dirname}/orders/${file.name}`;
         file.mv(filePath, err => {
@@ -78,7 +97,7 @@ client.connect(err => {
                 size: req.files.file.size,
                 img: Buffer(encImg, 'base64')
             };
-            orderCollection.insertOne({ name, email, service, projectDetails, price, projectFile })
+            orderCollection.insertOne({ name, email, service, projectDetails, price, status, projectFile })
                 .then(result => {
                     fs.remove(filePath, error => {
                         if (error) {
@@ -91,28 +110,39 @@ client.connect(err => {
         })
     })
 
-
-    //add user feedback
-    app.post('/addUserFeedback', (req, res) => {
-        const feedback = req.body;
-        userFeedBackCollection.insertOne(feedback)
-            .then(result => {
-                res.send(result.insertedCount > 0)
-            })
-    })
-    // load user feedback from database
-    app.get('/loadFeedback', (req, res) => {
-        userFeedBackCollection.find({})
-            .toArray((err, documents) => {
-                res.send(documents)
-            })
-    })
-
     // load service data from database
     app.get('/loadService', (req, res) => {
         serviceCollection.find({})
             .toArray((err, documents) => {
                 res.send(documents)
+            })
+    })
+    // load all orders from database
+    app.get('/loadAllOrders', (req, res) => {
+        orderCollection.find({})
+            .toArray((err, documents) => {
+                res.send(documents);
+            })
+    })
+
+    // load single order by matching user email
+    app.get('/userOrderSummary', (req, res) => {
+        // orderCollection.find({ email: req.query.email })
+        orderCollection.find({})
+            .toArray((err, documents) => {
+                res.send(documents)
+            })
+    })
+
+    // update user orders status
+    //update single event
+    app.patch('/updateStatus/', (req, res) => {
+        orderCollection.updateOne({ _id: ObjectId(req.query.id) }, {
+
+            $set: { status: req.body.status }
+        })
+            .then(result => {
+                res.send(result)
             })
     })
     // add admin in database
