@@ -23,7 +23,7 @@ client.connect(err => {
     const serviceCollection = client.db("cretiveAgencyDB").collection("services");
     const userFeedBackCollection = client.db("cretiveAgencyDB").collection("feedback");
     const adminCollection = client.db("cretiveAgencyDB").collection("admins");
-    const orderCollection = client.db("cretiveAgencyDB").collection("clientOrders");
+    const ordersCollections = client.db("cretiveAgencyDB").collection("clientOrders");
     console.log('database connected')
 
     // add new service in databse
@@ -98,7 +98,7 @@ client.connect(err => {
                 size: req.files.file.size,
                 img: Buffer(encImg, 'base64')
             };
-            orderCollection.insertOne({ name, email, service, projectDetails, price, status, projectFile })
+            ordersCollections.insertOne({ name, email, service, projectDetails, price, status, projectFile })
                 .then(result => {
                     fs.remove(filePath, error => {
                         if (error) {
@@ -120,7 +120,7 @@ client.connect(err => {
     })
     // load all orders from database
     app.get('/loadAllOrders', (req, res) => {
-        orderCollection.find({})
+        ordersCollections.find({})
             .toArray((err, documents) => {
                 res.send(documents);
             })
@@ -128,7 +128,7 @@ client.connect(err => {
 
     // load single order by matching user email
     app.get('/userOrderSummary', (req, res) => {
-        orderCollection.find({ email: req.query.email })
+        ordersCollections.find({ email: req.query.email })
             .toArray((err, documents) => {
                 res.send(documents)
             })
@@ -137,7 +137,7 @@ client.connect(err => {
     // update user orders status
     //update single event
     app.patch('/updateStatus/', (req, res) => {
-        orderCollection.updateOne({ _id: ObjectId(req.query.id) }, {
+        ordersCollections.updateOne({ _id: ObjectId(req.query.id) }, {
 
             $set: { status: req.body.status }
         })
