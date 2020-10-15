@@ -23,7 +23,7 @@ client.connect(err => {
     const serviceCollection = client.db("cretiveAgencyDB").collection("services");
     const userFeedBackCollection = client.db("cretiveAgencyDB").collection("feedback");
     const adminCollection = client.db("cretiveAgencyDB").collection("admins");
-    const orderCollection = client.db("cretiveAgencyDB").collection("clientsOrders");
+    const orderCollection = client.db("cretiveAgencyDB").collection("clientOrders");
     console.log('database connected')
 
     // add new service in databse
@@ -83,6 +83,7 @@ client.connect(err => {
         const projectDetails = req.body.projectDetails;
         const price = req.body.price;
         const status = req.body.status;
+        console.log(file, name, email, service, projectDetails, price, status);
 
         const filePath = `${__dirname}/orders/${file.name}`;
         file.mv(filePath, err => {
