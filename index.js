@@ -165,9 +165,6 @@ client.connect(err => {
     //close db connection
 });
 
-
-
-
 app.get('/', function (req, res) {
     res.send('Hey! I am woring properly right now')
 })
