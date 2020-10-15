@@ -127,8 +127,7 @@ client.connect(err => {
 
     // load single order by matching user email
     app.get('/userOrderSummary', (req, res) => {
-        // orderCollection.find({ email: req.query.email })
-        orderCollection.find({})
+        orderCollection.find({ email: req.query.email })
             .toArray((err, documents) => {
                 res.send(documents)
             })
