@@ -23,7 +23,7 @@ client.connect(err => {
     const serviceCollection = client.db("cretiveAgencyDB").collection("services");
     const userFeedBackCollection = client.db("cretiveAgencyDB").collection("feedback");
     const adminCollection = client.db("cretiveAgencyDB").collection("admins");
-    const orderCollection = client.db("cretiveAgencyDB").collection("orders");
+    const orderCollection = client.db("cretiveAgencyDB").collection("clientsOrders");
     console.log('database connected')
 
     // add new service in databse
