@@ -31,30 +31,19 @@ client.connect(err => {
         const file = req.files.file;
         const serviceTitle = req.body.serviceTitle;
         const description = req.body.description;
-        const filePath = `${__dirname}/services/${file.name}`;
-        file.mv(filePath, err => {
-            if (err) {
-                console.log(err);
-                res.status(500).send({ msg: 'Failed to upload image' });
-            }
-            const newImg = fs.readFileSync(filePath);
-            const encImg = newImg.toString('base64');
-            const serviceImage = {
-                contentType: req.files.file.mimetype,
-                size: req.files.file.size,
-                img: Buffer(encImg, 'base64')
-            };
-            serviceCollection.insertOne({ serviceTitle, description, serviceImage })
-                .then(result => {
-                    fs.remove(filePath, error => {
-                        if (error) {
-                            console.log(error)
-                        }
-                        res.send(result.insertedCount > 0)
-                    });
 
-                })
-        })
+        const newImg = file.data;
+        const encImg = newImg.toString('base64');
+        const serviceImage = {
+            contentType: file.mimetype,
+            size: file.size,
+            img: Buffer.from(encImg, 'base64')
+        };
+        serviceCollection.insertOne({ serviceTitle, description, serviceImage })
+            .then(result => {
+
+                res.send(result.insertedCount > 0)
+            })
     })
 
     //add user feedback
@@ -65,10 +54,11 @@ client.connect(err => {
                 res.send(result.insertedCount > 0)
             })
     })
+    
     // load user feedback from database
     // here loard last 6 users feedback
     app.get('/loadFeedback', (req, res) => {
-        userFeedBackCollection.find({}).sort({_id:-1}).limit(6)
+        userFeedBackCollection.find({}).sort({ _id: -1 }).limit(6)
             .toArray((err, documents) => {
                 res.send(documents)
             })
@@ -84,30 +74,17 @@ client.connect(err => {
         const price = req.body.price;
         const status = req.body.status;
 
-        const filePath = `${__dirname}/orders/${file.name}`;
-        file.mv(filePath, err => {
-            if (err) {
-                console.log(err);
-                res.status(500).send({ msg: 'Failed to upload image' });
-            }
-            const newImg = fs.readFileSync(filePath);
-            const encImg = newImg.toString('base64');
-            const projectFile = {
-                contentType: req.files.file.mimetype,
-                size: req.files.file.size,
-                img: Buffer(encImg, 'base64')
-            };
-            orderCollection.insertOne({ name, email, service, projectDetails, price, status, projectFile })
-                .then(result => {
-                    fs.remove(filePath, error => {
-                        if (error) {
-                            console.log(error)
-                        }
-                        res.send(result.insertedCount > 0)
-                    });
-
-                })
-        })
+        const newImg = file.data;
+        const encImg = newImg.toString('base64');
+        const projectFile = {
+            contentType: file.mimetype,
+            size: file.size,
+            img: Buffer.from(encImg, 'base64')
+        };
+        orderCollection.insertOne({ name, email, service, projectDetails, price, status, projectFile })
+            .then(result => {
+                res.send(result.insertedCount > 0)
+            })
     })
 
     // load service data from database
