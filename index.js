@@ -54,7 +54,7 @@ client.connect(err => {
                 res.send(result.insertedCount > 0)
             })
     })
-    
+
     // load user feedback from database
     // here loard last 6 users feedback
     app.get('/loadFeedback', (req, res) => {
@@ -113,6 +113,7 @@ client.connect(err => {
     // update user orders status
     //update single event
     app.patch('/updateStatus/', (req, res) => {
+        console.log(req.query.id);
         orderCollection.updateOne({ _id: ObjectId(req.query.id) }, {
 
             $set: { status: req.body.status }
